@@ -999,13 +999,43 @@
       tooltip.style.top  = e.clientY + "px";
     }
 
+    // ── localStorage persistence ──
+    const STORAGE_KEY = "hunt_kda_data";
+
+    function saveData() {
+      const data = {
+        kills:   killsInput.value,
+        deaths:  deathsInput.value,
+        assists: assistsInput.value,
+        history: kdaHistory.map(p => ({ time: p.time.toISOString(), value: p.value })),
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function loadData() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        if (data.kills   !== undefined) killsInput.value   = data.kills;
+        if (data.deaths  !== undefined) deathsInput.value  = data.deaths;
+        if (data.assists !== undefined) assistsInput.value = data.assists;
+        if (Array.isArray(data.history)) {
+          kdaHistory = data.history.map(p => ({ time: new Date(p.time), value: p.value }));
+        }
+      } catch (e) { /* corrupted data — start fresh */ }
+    }
+
     // ── Event listeners ──
-    calcBtn.addEventListener("click", calculate);
-    resetBtn.addEventListener("click", reset);
+    calcBtn.addEventListener("click", () => { calculate(); saveData(); });
+    resetBtn.addEventListener("click", () => { reset(); saveData(); });
     tabToggleBtn.addEventListener("click", switchTab);
     [killsInput, assistsInput, deathsInput].forEach(el => el.addEventListener("input", liveUpdate));
 
+    // ── Boot ──
+    loadData();
     drawGraph();
+    liveUpdate();
   </script>
 </body>
 </html>
