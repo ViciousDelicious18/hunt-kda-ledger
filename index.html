@@ -4,14 +4,9 @@
   <meta charset="UTF-8" />
   <title>Hunt KDA Tracker</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Roboto:wght@300;400;500&family=UnifrakturCook:wght@700&display=swap" rel="stylesheet" />
-
   <style>
     :root {
-      --bg-black: #020205;
-      --panel-bg: #111015;
-      --panel-inner: #18161d;
       --crimson: #b3263a;
       --crimson-light: #e04a5a;
       --crimson-deep: #6b1220;
@@ -22,15 +17,107 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
+    html { font-size: 19px; }
+
     body {
       min-height: 100vh;
       background: radial-gradient(circle at top, #15121f 0, #050308 40%, #020205 100%);
       color: var(--text-main);
-      font-family: "Roboto", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: "Roboto", system-ui, sans-serif;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 28px 16px;
+    }
+
+    /* ── PAGE LAYOUT ── */
+    .page-layout {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: flex-start;
+      gap: 100px;
+      max-width: 1500px;
+      width: 100%;
+    }
+
+    /* ── HEART SIDEBAR ── */
+    .heart-sidebar {
+      flex-shrink: 0;
+      width: 500px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 92px;
+      padding-right: 10px;
+      margin-left: -200px;   /* push heart further left */
+      position: sticky;
+      top: 28px;
+      align-self: flex-start;
+    }
+
+    .sidebar-heart-wrap {
+      position: relative;
+      width: 540px;
+      height: 540px;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 24px;
+    }
+
+    .sidebar-heart-glow {
+      position: absolute;
+      inset: 60px;
+      border-radius: 50%;
+      background: radial-gradient(circle,
+        rgba(240,20,45,0.38) 0%,
+        rgba(200,14,35,0.14) 55%,
+        transparent 80%
+      );
+      filter: blur(18px);
+      animation: glowPulse 1.5s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .sidebar-heart-img {
+      width: 540px;
+      height: 540px;
+      object-fit: contain;
+      will-change: transform;
+      filter:
+        drop-shadow(0 0 10px rgba(0,0,0,0.99))
+        drop-shadow(0 0 22px rgba(240,20,48,0.95))
+        drop-shadow(0 0 48px rgba(210,18,42,0.70))
+        drop-shadow(0 0 90px rgba(175,14,34,0.42))
+        drop-shadow(0 0 130px rgba(140,10,28,0.18));
+      animation: heartPulse 1.5s ease-in-out infinite;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── CONTENT COLUMN ── */
+    .content-col {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    @media (max-width: 900px) {
+      .page-layout { flex-direction: column; gap: 0; }
+      .heart-sidebar {
+        width: 100%;
+        padding-top: 0;
+        padding-right: 0;
+        margin-left: 0;
+        padding-bottom: 14px;
+        position: static;
+        justify-content: center;
+      }
+      .sidebar-heart-wrap { width: 160px; height: 160px; }
+      .sidebar-heart-img  { width: 160px; height: 160px; }
     }
 
     .fog-overlay {
@@ -39,58 +126,66 @@
       pointer-events: none;
       background:
         radial-gradient(circle at 10% 0%, rgba(255,255,255,0.04) 0, transparent 55%),
-        radial-gradient(circle at 90% 20%, rgba(255,255,255,0.03) 0, transparent 60%),
-        radial-gradient(circle at 50% 100%, rgba(255,255,255,0.02) 0, transparent 65%);
+        radial-gradient(circle at 90% 20%, rgba(255,255,255,0.03) 0, transparent 60%);
       mix-blend-mode: screen;
       opacity: 0.6;
       z-index: 0;
     }
 
-    .container {
-      position: relative;
-      z-index: 1;
-      max-width: 960px;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
+    @keyframes heartPulse {
+      0%   { transform: scale(1); }
+      10%  { transform: scale(1.10); }
+      20%  { transform: scale(1.04); }
+      30%  { transform: scale(1.09); }
+      44%  { transform: scale(1); }
+      100% { transform: scale(1); }
     }
 
+    @keyframes glowPulse {
+      0%   { opacity: 0.4; transform: scale(0.94); }
+      10%  { opacity: 1;   transform: scale(1.06); }
+      30%  { opacity: 1;   transform: scale(1.06); }
+      44%  { opacity: 0.4; transform: scale(0.94); }
+      100% { opacity: 0.4; transform: scale(0.94); }
+    }
+
+    /* ── TITLE (text only) ── */
     .title-block {
-      text-align: center;
-      margin-bottom: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 2px;
     }
 
     .title-block h1 {
       font-family: "Cinzel", serif;
       font-weight: 700;
-      letter-spacing: 0.18em;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
-      font-size: 1.4rem;
+      font-size: 1.55rem;
       color: var(--accent-gold);
-      text-shadow: 0 0 12px rgba(0, 0, 0, 0.9);
+      text-shadow: 0 0 14px rgba(0,0,0,0.9);
+      line-height: 1;
     }
 
     .title-block h1 span { color: var(--crimson); }
 
     .title-block p {
-      margin-top: 6px;
-      font-size: 0.9rem;
+      font-size: 0.8rem;
       color: var(--text-muted);
-      letter-spacing: 0.08em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
     }
 
+    /* ── PANEL ── */
     .panel {
-      position: relative;
-      background: radial-gradient(circle at top, #221b24 0, var(--panel-bg) 40%, #0a070c 100%);
+      background: radial-gradient(circle at top, #221b24 0, #111015 40%, #0a070c 100%);
       border-radius: 10px;
       padding: 18px;
       box-shadow:
         0 0 0 1px rgba(0,0,0,0.9),
         0 0 24px rgba(0,0,0,0.9),
-        0 0 32px rgba(179,38,58,0.35);
-      overflow: hidden;
+        0 0 32px rgba(179,38,58,0.28);
     }
 
     .panel-inner {
@@ -98,9 +193,7 @@
       border-radius: 8px;
       padding: 16px;
       border: 1px solid rgba(255,255,255,0.04);
-      box-shadow:
-        inset 0 0 18px rgba(0,0,0,0.9),
-        0 0 18px rgba(0,0,0,0.8);
+      box-shadow: inset 0 0 18px rgba(0,0,0,0.9);
     }
 
     .panel-header {
@@ -120,26 +213,25 @@
     }
 
     .panel-header span {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--text-muted);
-      letter-spacing: 0.12em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
     }
 
+    /* ── INPUTS ── */
     .grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 14px 18px;
     }
 
-    @media (max-width: 720px) {
-      .grid { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
 
-    .field { display: flex; flex-direction: column; gap: 4px; }
+    .field { display: flex; flex-direction: column; gap: 5px; }
 
     .field label {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--text-muted);
@@ -149,269 +241,404 @@
       background: radial-gradient(circle at top, #26212c 0, #15121b 40%, #0b090f 100%);
       border-radius: 6px;
       border: 1px solid rgba(255,255,255,0.06);
-      padding: 7px 9px;
+      padding: 8px 10px;
       color: var(--text-main);
-      font-size: 0.9rem;
+      font-size: 1rem;
       outline: none;
-      box-shadow:
-        inset 0 0 10px rgba(0,0,0,0.9),
-        0 0 0 1px rgba(0,0,0,0.7);
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.9);
       -moz-appearance: textfield;
+      width: 100%;
     }
 
     .field input[type="number"]::-webkit-outer-spin-button,
-    .field input[type="number"]::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
+    .field input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
 
     .field input[type="number"]:focus {
       border-color: var(--crimson);
-      box-shadow:
-        0 0 0 1px rgba(179,38,58,0.7),
-        0 0 14px rgba(179,38,58,0.4);
-      background: radial-gradient(circle at top, #2d2634 0, #18141f 40%, #0d0a11 100%);
+      box-shadow: 0 0 0 1px rgba(179,38,58,0.55), 0 0 12px rgba(179,38,58,0.28),
+                  inset 0 0 10px rgba(0,0,0,0.9);
     }
 
-    .btn-row {
-      margin-top: 16px;
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    button {
-      cursor: pointer;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.08);
-      padding: 7px 16px;
-      font-size: 0.85rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      background: radial-gradient(circle at top, #2b1a1f 0, #1a1014 40%, #0b0507 100%);
-      color: var(--text-main);
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      box-shadow:
-        0 0 0 1px rgba(0,0,0,0.9),
-        0 0 14px rgba(0,0,0,0.9);
-    }
-
-    button span.dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 999px;
-      background: radial-gradient(circle, var(--crimson) 0, #3b050c 70%);
-      box-shadow: 0 0 8px rgba(179,38,58,0.7);
-    }
-
-    .results {
-      margin-top: 18px;
-      border-top: 1px solid rgba(255,255,255,0.06);
-      padding-top: 14px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px 14px;
-    }
-
-    @media (max-width: 720px) {
-      .results { grid-template-columns: 1fr; }
-    }
-
-    .result-block {
-      background: radial-gradient(circle at top, #241821 0, #151018 40%, #09060c 100%);
-      border-radius: 8px;
-      padding: 10px 11px 11px;
-      border: 1px solid rgba(255,255,255,0.04);
-      box-shadow:
-        inset 0 0 10px rgba(0,0,0,0.9),
-        0 0 12px rgba(0,0,0,0.8);
-    }
-
-    .result-label {
-      font-size: 0.75rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 4px;
-    }
-
-    .result-value {
-      font-family: "UnifrakturCook", serif;
-      font-size: 1.8rem; /* ~50% bigger */
-      letter-spacing: 0.02em;
-      color: var(--crimson-light);
-      text-shadow:
-        0 0 6px rgba(0,0,0,0.9),
-        0 0 8px rgba(179,38,58,0.5);
-    }
-
-    /* CURRENT KDA + HEART */
-    .kda-main-row {
+    /* ── BOTTOM BAR (always visible) ── */
+    .panel-bottom {
+      margin-top: 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
     }
 
-    .heart-wrapper {
-      width: 160px;
-      height: 160px;
-      display: flex;
+    .btn-group { display: flex; gap: 10px; }
+
+    button {
+      cursor: pointer;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 7px 18px;
+      font-size: 0.82rem;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      background: radial-gradient(circle at top, #2b1a1f 0, #1a1014 40%, #0b0507 100%);
+      color: var(--text-main);
+      display: inline-flex;
       align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      overflow: visible;
+      gap: 6px;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.9), 0 0 12px rgba(0,0,0,0.8);
+      transition: box-shadow 0.15s ease;
     }
 
-    .heart-pulse {
-      width: 160px;
-      height: 160px;
-      animation: heartPulse 1.4s ease-in-out infinite;
+    button:hover {
+      box-shadow: 0 0 0 1px rgba(179,38,58,0.38), 0 0 12px rgba(179,38,58,0.2);
     }
 
-    .heart-graphic {
-      width: 100%;
-      height: 100%;
-      background-image: url("./heart-gothic.png");
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center;
-      filter:
-        drop-shadow(0 0 12px rgba(0,0,0,0.9))
-        drop-shadow(0 0 14px rgba(179,38,58,0.4));
+    button span.dot {
+      width: 6px; height: 6px;
+      border-radius: 999px;
+      background: radial-gradient(circle, var(--crimson) 0, #3b050c 70%);
+      box-shadow: 0 0 8px rgba(179,38,58,0.7);
     }
 
-    @keyframes heartPulse {
-      0% { transform: scale(1); }
-      30% { transform: scale(1.06); }
-      60% { transform: scale(1); }
-      100% { transform: scale(1); }
+    #tabToggleBtn span.dot {
+      background: radial-gradient(circle, #8a7050 0, #3a2a10 70%);
+      box-shadow: 0 0 8px rgba(180,150,80,0.5);
+    }
+
+    /* ── TAB PANES ── */
+    .tab-pane {
+      transition: opacity 0.22s ease;
+    }
+
+    .tab-pane.hidden {
+      display: none;
+    }
+
+    /* ── RESULTS ── */
+    .results {
+      margin-top: 16px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      padding-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px 14px;
+    }
+
+    @media (max-width: 600px) { .results { grid-template-columns: 1fr; } }
+
+    .result-block {
+      background: radial-gradient(circle at top, #241821 0, #151018 40%, #09060c 100%);
+      border-radius: 8px;
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,0.04);
+      box-shadow: inset 0 0 12px rgba(0,0,0,0.9);
+    }
+
+    .result-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .result-value {
+      font-family: "Cinzel", serif;
+      font-weight: 600;
+      font-size: 1.85rem;
+      color: var(--crimson-light);
+      text-shadow: 0 0 6px rgba(0,0,0,0.9), 0 0 10px rgba(179,38,58,0.4);
+      line-height: 1;
+      letter-spacing: 0.04em;
+    }
+
+    .result-value.trend-up   { color: #5ecf7a; text-shadow: 0 0 10px rgba(60,180,90,0.4); }
+    .result-value.trend-down { color: var(--crimson-light); }
+    .result-value.trend-flat { color: var(--text-muted); text-shadow: none; }
+
+    .result-sub {
+      margin-top: 4px;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
     }
 
     .footer-note {
       margin-top: 10px;
-      font-size: 0.75rem;
-      color: var(--text-muted);
+      font-size: 0.72rem;
+      color: rgba(163,154,169,0.35);
       text-align: right;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.09em;
       text-transform: uppercase;
     }
 
-    /* GRAPH PANEL */
-    .sparkline-container {
+    /* ── GRAPH ── */
+    .graph-wrap {
       margin-top: 6px;
-      background: radial-gradient(circle at top, #241821 0, #151018 40%, #09060c 100%);
+      background: #07050d;
       border-radius: 8px;
-      padding: 10px 11px 12px;
-      border: 1px solid rgba(255,255,255,0.04);
-      box-shadow:
-        inset 0 0 10px rgba(0,0,0,0.9),
-        0 0 12px rgba(0,0,0,0.8);
+      padding: 14px 14px 12px;
+      border: 1px solid rgba(255,255,255,0.03);
+      box-shadow: inset 0 0 30px rgba(0,0,0,0.98);
+      position: relative;
     }
 
-    .sparkline-shell {
+    .graph-shell {
       position: relative;
       width: 100%;
-      height: 160px;
-      border-radius: 6px;
-      overflow: visible;
+      height: 150px;
     }
 
-    #kdaGraph {
-      width: 100%;
-      height: 100%;
-      display: block;
+    #kdaGraph { width: 100%; height: 100%; display: block; }
+
+    .graph-empty {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.72rem;
+      color: rgba(163,154,169,0.2);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      pointer-events: none;
     }
 
+    /* ── TOOLTIP ── */
     .sparkline-tooltip {
       position: fixed;
       pointer-events: none;
-      background: radial-gradient(circle at top, #2b1a1f 0, #14090d 40%, #050103 100%);
+      background: linear-gradient(135deg, #1e0e14, #0d060a);
       color: var(--text-main);
-      padding: 6px 9px;
+      padding: 7px 11px;
       border-radius: 6px;
-      font-size: 0.75rem;
-      border: 1px solid rgba(179,38,58,0.7);
-      box-shadow:
-        0 0 0 1px rgba(0,0,0,0.9),
-        0 0 16px rgba(179,38,58,0.6);
+      font-size: 0.73rem;
+      letter-spacing: 0.04em;
+      border: 1px solid rgba(179,38,58,0.5);
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.9), 0 0 16px rgba(179,38,58,0.35);
       opacity: 0;
-      transform: translate(-50%, -120%);
-      transition: opacity 0.12s ease;
-      z-index: 20;
+      transform: translate(-50%, -130%);
+      transition: opacity 0.1s ease;
+      z-index: 100;
       white-space: nowrap;
     }
 
     .sparkline-tooltip.visible { opacity: 1; }
+
+    /* ── LORE MODAL ── */
+    .lore-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      background: rgba(2, 1, 5, 0.97);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.55s ease;
+      cursor: pointer;
+    }
+
+    .lore-modal.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .lore-fog {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      filter: blur(40px);
+    }
+
+    .lore-fog-1 {
+      width: 70vw; height: 70vw;
+      top: -25%; left: -15%;
+      background: radial-gradient(circle, rgba(255,255,255,0.055) 0%, transparent 65%);
+      animation: fogDrift1 9s ease-in-out infinite;
+    }
+
+    .lore-fog-2 {
+      width: 55vw; height: 55vw;
+      bottom: -22%; right: -12%;
+      background: radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 65%);
+      animation: fogDrift2 11s ease-in-out infinite;
+    }
+
+    .lore-fog-3 {
+      width: 45vw; height: 45vw;
+      top: 25%; left: 35%;
+      background: radial-gradient(circle, rgba(179,38,58,0.07) 0%, transparent 65%);
+      animation: fogDrift3 13s ease-in-out infinite;
+    }
+
+    .lore-fog-4 {
+      width: 38vw; height: 38vw;
+      top: 60%; left: 5%;
+      background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 65%);
+      animation: fogDrift1 15s ease-in-out infinite reverse;
+    }
+
+    @keyframes fogDrift1 {
+      0%, 100% { transform: translate(0,   0)   scale(1);    }
+      50%       { transform: translate(5%,  3%)  scale(1.10); }
+    }
+    @keyframes fogDrift2 {
+      0%, 100% { transform: translate(0,   0)   scale(1);    }
+      50%       { transform: translate(-4%, -5%) scale(1.08); }
+    }
+    @keyframes fogDrift3 {
+      0%, 100% { transform: translate(0,  0)   scale(1);    }
+      50%       { transform: translate(3%, -4%) scale(1.13); }
+    }
+
+    .lore-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 700px;
+      padding: 48px 40px;
+      text-align: center;
+    }
+
+    .lore-text {
+      font-family: "UnifrakturCook", serif;
+      font-size: 1.35rem;
+      line-height: 1.95;
+      color: var(--text-main);
+      text-shadow:
+        0 0 18px rgba(179,38,58,0.65),
+        0 0 38px rgba(179,38,58,0.28),
+        0 2px 6px rgba(0,0,0,0.95);
+      letter-spacing: 0.02em;
+    }
+
+    .lore-hint {
+      margin-top: 36px;
+      font-size: 0.7rem;
+      color: rgba(163,154,169,0.3);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
   </style>
 </head>
 
 <body>
   <div class="fog-overlay"></div>
 
-  <div class="container">
+  <!-- LORE MODAL -->
+  <div id="loreModal" class="lore-modal">
+    <div class="lore-fog lore-fog-1"></div>
+    <div class="lore-fog lore-fog-2"></div>
+    <div class="lore-fog lore-fog-3"></div>
+    <div class="lore-fog lore-fog-4"></div>
+    <div class="lore-inner">
+      <p class="lore-text">
+        Savage, nightmarish monsters roam the Louisiana swamps and Colorado mountains.
+        You are part of a group of rugged bounty hunters bound to rid the world of their ghastly presence.
+        Banish these creatures from our world, and you will be paid generously—and given the chance to buy more gruesome and powerful weapons.
+        Fail, and death will strip you of both character and gear.
+        Your experience, however, remains in your pool of hunters—called your Bloodline—always.
+      </p>
+      <p class="lore-hint">— click anywhere to return —</p>
+    </div>
+  </div>
+
+  <div class="page-layout">
+
+    <!-- LEFT: HEART SIDEBAR -->
+    <div class="heart-sidebar">
+      <div class="sidebar-heart-wrap" id="heartLogo" title="Click to reveal the truth">
+        <div class="sidebar-heart-glow"></div>
+        <img class="sidebar-heart-img" src="./heart-gothic.png" alt="" />
+      </div>
+    </div>
+
+    <!-- RIGHT: CONTENT -->
+    <div class="content-col">
+
+    <!-- HEADER -->
     <div class="title-block">
       <h1><span>Hunt</span> KDA Ledger</h1>
       <p>Charred record of your bayou performance</p>
     </div>
 
-    <!-- MAIN LEDGER -->
+    <!-- STATS PANEL -->
     <div class="panel">
       <div class="panel-inner">
         <div class="panel-header">
-          <h2>Blooded Stats</h2>
-          <span>No place for remorse in the life of a hunter.</span>
+          <h2 id="panelTitle">Blooded Stats</h2>
+          <span id="panelSub">No place for remorse in the life of a hunter.</span>
         </div>
 
-        <div class="grid">
-          <div class="field">
-            <label for="kills">Kills</label>
-            <input id="kills" type="number" min="0" step="1" value="0" />
-          </div>
-
-          <div class="field">
-            <label for="assists">Assists</label>
-            <input id="assists" type="number" min="0" step="1" value="0" />
-          </div>
-
-          <div class="field">
-            <label for="deaths">Deaths</label>
-            <input id="deaths" type="number" min="0" step="1" value="0" />
-          </div>
-        </div>
-
-        <div class="btn-row">
-          <button id="calcBtn"><span class="dot"></span>Calculate</button>
-          <button id="resetBtn"><span class="dot"></span>Reset</button>
-        </div>
-
-        <div class="results">
-          <!-- CURRENT KDA -->
-          <div class="result-block">
-            <div class="result-label">Current KDA</div>
-            <div class="kda-main-row">
-              <div class="result-value" id="currentKda">0.00</div>
-              <div class="heart-wrapper">
-                <div class="heart-pulse">
-                  <div class="heart-graphic"></div>
-                </div>
-              </div>
+        <!-- TAB 0: BLOODED STATS -->
+        <div id="tab0" class="tab-pane">
+          <div class="grid">
+            <div class="field">
+              <label for="kills">Kills</label>
+              <input id="kills" type="number" min="0" step="1" placeholder="0" />
+            </div>
+            <div class="field">
+              <label for="deaths">Deaths</label>
+              <input id="deaths" type="number" min="0" step="1" placeholder="0" />
+            </div>
+            <div class="field">
+              <label for="assists">Assists</label>
+              <input id="assists" type="number" min="0" step="1" placeholder="0" />
             </div>
           </div>
 
-          <!-- KA +0.01 (label cleaned) -->
-          <div class="result-block">
-            <div class="result-label">Kills / Assists to go up</div>
-            <div class="result-value" id="killsToGoUp">0</div>
+          <div class="results">
+            <div class="result-block">
+              <div class="result-label">Current KDA</div>
+              <div class="result-value" id="currentKda">—</div>
+            </div>
+            <div class="result-block">
+              <div class="result-label">Kills / Assists to +0.01</div>
+              <div class="result-value" id="killsToGoUp">—</div>
+            </div>
+            <div class="result-block">
+              <div class="result-label">Deaths to −0.01</div>
+              <div class="result-value" id="deathsToGoDown">—</div>
+            </div>
           </div>
+        </div>
 
-          <!-- DEATHS -0.01 (label cleaned) -->
-          <div class="result-block">
-            <div class="result-label">Deaths to go down</div>
-            <div class="result-value" id="deathsToGoDown">0</div>
+        <!-- TAB 1: EXTRA STATS -->
+        <div id="tab1" class="tab-pane hidden">
+          <div class="results" style="margin-top:0; border-top:none; padding-top:0;">
+            <div class="result-block">
+              <div class="result-label">K / D Ratio</div>
+              <div class="result-value" id="kdRatio">—</div>
+              <div class="result-sub">Kills only ÷ Deaths</div>
+            </div>
+            <div class="result-block">
+              <div class="result-label">Kill Participation</div>
+              <div class="result-value" id="killPart">—</div>
+              <div class="result-sub">% of KA that were kills</div>
+            </div>
+            <div class="result-block">
+              <div class="result-label">Trend</div>
+              <div class="result-value" id="trend">—</div>
+              <div class="result-sub" id="trendSub">vs previous entry</div>
+            </div>
+            <div class="result-block">
+              <div class="result-label">Personal Best</div>
+              <div class="result-value" id="personalBest">—</div>
+              <div class="result-sub">Highest KDA recorded</div>
+            </div>
+            <div class="result-block">
+              <div class="result-label">Session Average</div>
+              <div class="result-value" id="sessionAvg">—</div>
+              <div class="result-sub">Mean across all entries</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ALWAYS-VISIBLE BOTTOM BAR -->
+        <div class="panel-bottom">
+          <button id="tabToggleBtn"><span class="dot"></span><span id="tabToggleLabel">Extra Stats</span></button>
+          <div class="btn-group">
+            <button id="calcBtn"><span class="dot"></span>Calculate</button>
+            <button id="resetBtn"><span class="dot"></span>Reset</button>
           </div>
         </div>
 
@@ -424,228 +651,361 @@
       <div class="panel-inner">
         <div class="panel-header">
           <h2>KDA Evolution</h2>
-          <span>Ledger trend over recent hunts</span>
+          <span>Trend over recent calculations</span>
         </div>
-
-        <div class="sparkline-container">
-          <div class="sparkline-shell">
+        <div class="graph-wrap">
+          <div class="graph-shell">
             <svg id="kdaGraph" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+            <div class="graph-empty" id="graphEmpty">No data yet — start calculating</div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+
+    </div><!-- /content-col -->
+  </div><!-- /page-layout -->
 
   <div id="sparkTooltip" class="sparkline-tooltip"></div>
 
   <script>
-    const killsInput = document.getElementById("kills");
+    // ── Elements ──
+    const killsInput   = document.getElementById("kills");
     const assistsInput = document.getElementById("assists");
-    const deathsInput = document.getElementById("deaths");
+    const deathsInput  = document.getElementById("deaths");
 
-    const currentKdaEl = document.getElementById("currentKda");
-    const killsToGoUpEl = document.getElementById("killsToGoUp");
+    const currentKdaEl     = document.getElementById("currentKda");
+    const killsToGoUpEl    = document.getElementById("killsToGoUp");
     const deathsToGoDownEl = document.getElementById("deathsToGoDown");
+    const kdRatioEl        = document.getElementById("kdRatio");
+    const killPartEl       = document.getElementById("killPart");
+    const trendEl          = document.getElementById("trend");
+    const trendSubEl       = document.getElementById("trendSub");
+    const personalBestEl   = document.getElementById("personalBest");
+    const sessionAvgEl     = document.getElementById("sessionAvg");
 
-    const calcBtn = document.getElementById("calcBtn");
-    const resetBtn = document.getElementById("resetBtn");
+    const calcBtn       = document.getElementById("calcBtn");
+    const resetBtn      = document.getElementById("resetBtn");
+    const tabToggleBtn  = document.getElementById("tabToggleBtn");
+    const tabToggleLabel= document.getElementById("tabToggleLabel");
+    const tab0          = document.getElementById("tab0");
+    const tab1          = document.getElementById("tab1");
+    const panelTitle    = document.getElementById("panelTitle");
+    const panelSub      = document.getElementById("panelSub");
 
-    const graphSvg = document.getElementById("kdaGraph");
-    const tooltip = document.getElementById("sparkTooltip");
+    const graphSvg   = document.getElementById("kdaGraph");
+    const tooltip    = document.getElementById("sparkTooltip");
+    const graphEmpty = document.getElementById("graphEmpty");
+
+    const heartLogo  = document.getElementById("heartLogo");
+    const loreModal  = document.getElementById("loreModal");
 
     let kdaHistory = [];
+    let activeTab  = 0;
 
-    function parseNumber(el) {
-      const v = parseFloat(el.value);
-      return isNaN(v) ? 0 : v;
+    // ── Input helpers ──
+    function parseNum(el) {
+      const v = parseInt(el.value, 10);
+      return isNaN(v) || v < 0 ? 0 : v;
     }
 
-    function calculate() {
-      const kills = Math.max(0, parseNumber(killsInput));
-      const assists = Math.max(0, parseNumber(assistsInput));
-      const deaths = Math.max(0, parseNumber(deathsInput));
+    [killsInput, assistsInput, deathsInput].forEach(el => {
+      el.addEventListener("focus", () => el.select());
+    });
 
+    // ── Core calculation ──
+    function computeStats() {
+      const kills   = parseNum(killsInput);
+      const assists = parseNum(assistsInput);
+      const deaths  = parseNum(deathsInput);
       const totalKA = kills + assists;
+      let kda;
+      if (deaths === 0) kda = totalKA === 0 ? 0 : Infinity;
+      else              kda = totalKA / deaths;
+      return { kills, assists, deaths, totalKA, kda };
+    }
 
-      let currentKda;
-      if (deaths === 0) {
-        currentKda = totalKA === 0 ? 0 : Infinity;
-      } else {
-        currentKda = totalKA / deaths;
-      }
+    function displayStats({ kills, totalKA, deaths, kda }) {
+      currentKdaEl.textContent = kda === Infinity ? "∞" : kda.toFixed(2);
 
-      if (currentKda === Infinity) {
-        currentKdaEl.textContent = "∞";
-      } else {
-        currentKdaEl.textContent = currentKda.toFixed(2);
-      }
+      if (isFinite(kda) && deaths > 0) {
+        const disp = Math.round(kda * 100) / 100;
 
-      // +0.01 KDA logic
-      if (isFinite(currentKda) && deaths > 0) {
-        const targetUp = currentKda + 0.01;
-        const neededKA = targetUp * deaths;
-        const diff = neededKA - totalKA;
-        killsToGoUpEl.textContent = diff <= 0 ? 0 : Math.ceil(diff);
-      } else {
-        killsToGoUpEl.textContent = 0;
-      }
+        const neededKA = Math.ceil((disp + 0.005) * deaths);
+        const upNeeded = neededKA - totalKA;
+        killsToGoUpEl.textContent = upNeeded <= 0 ? "0" : String(upNeeded);
 
-      // -0.01 KDA logic
-      if (isFinite(currentKda) && currentKda > 0) {
-        const targetDown = currentKda - 0.01;
-        if (targetDown <= 0) {
-          deathsToGoDownEl.textContent = 0;
+        const downThresh = disp - 0.005;
+        if (downThresh <= 0) {
+          deathsToGoDownEl.textContent = "—";
         } else {
-          const maxDeaths = totalKA / targetDown;
-          const diff = Math.floor(maxDeaths - deaths);
-          deathsToGoDownEl.textContent = diff <= 0 ? 0 : diff;
+          const downNeeded = Math.ceil(totalKA / downThresh - deaths);
+          deathsToGoDownEl.textContent = downNeeded <= 0 ? "0" : String(downNeeded);
         }
       } else {
-        deathsToGoDownEl.textContent = 0;
+        killsToGoUpEl.textContent    = "—";
+        deathsToGoDownEl.textContent = "—";
       }
 
-      if (isFinite(currentKda)) {
-        addKdaPoint(currentKda);
+      updateExtraStats(kills, totalKA, deaths, kda);
+    }
+
+    // Called on every keystroke — updates display only, no history recorded
+    function liveUpdate() {
+      displayStats(computeStats());
+    }
+
+    // Called only on Calculate button — records to history and updates graph
+    function calculate() {
+      const stats = computeStats();
+      displayStats(stats);
+      if (isFinite(stats.kda)) addKdaPoint(stats.kda);
+      updateExtraStats(stats.kills, stats.totalKA, stats.deaths, stats.kda);
+    }
+
+    // ── Extra stats ──
+    function updateExtraStats(kills, totalKA, deaths, kda) {
+      // K/D ratio
+      if (deaths === 0) {
+        kdRatioEl.textContent = kills > 0 ? "∞" : "—";
+      } else {
+        kdRatioEl.textContent = (kills / deaths).toFixed(2);
+      }
+
+      // Kill participation %
+      if (totalKA === 0) {
+        killPartEl.textContent = "—";
+      } else {
+        killPartEl.textContent = ((kills / totalKA) * 100).toFixed(1) + "%";
+      }
+
+      // Trend (compare last two history entries)
+      trendEl.className = "result-value";
+      if (kdaHistory.length >= 2) {
+        const curr  = kdaHistory[kdaHistory.length - 1].value;
+        const prev  = kdaHistory[kdaHistory.length - 2].value;
+        const delta = curr - prev;
+        if (delta > 0.004) {
+          trendEl.textContent = "↑";
+          trendEl.classList.add("trend-up");
+          trendSubEl.textContent = "+" + delta.toFixed(2) + " vs previous";
+        } else if (delta < -0.004) {
+          trendEl.textContent = "↓";
+          trendEl.classList.add("trend-down");
+          trendSubEl.textContent = delta.toFixed(2) + " vs previous";
+        } else {
+          trendEl.textContent = "=";
+          trendEl.classList.add("trend-flat");
+          trendSubEl.textContent = "Steady";
+        }
+      } else {
+        trendEl.textContent    = "—";
+        trendSubEl.textContent = "vs previous entry";
+      }
+
+      // Personal best
+      if (kdaHistory.length > 0) {
+        const best = Math.max(...kdaHistory.map(p => p.value));
+        personalBestEl.textContent = best.toFixed(2);
+      } else {
+        personalBestEl.textContent = "—";
+      }
+
+      // Session average
+      if (kdaHistory.length > 0) {
+        const avg = kdaHistory.reduce((s, p) => s + p.value, 0) / kdaHistory.length;
+        sessionAvgEl.textContent = avg.toFixed(2);
+      } else {
+        sessionAvgEl.textContent = "—";
       }
     }
 
+    // ── Reset ──
     function reset() {
-      killsInput.value = "0";
-      assistsInput.value = "0";
-      deathsInput.value = "0";
-      currentKdaEl.textContent = "0.00";
-      killsToGoUpEl.textContent = "0";
-      deathsToGoDownEl.textContent = "0";
+      killsInput.value   = "";
+      assistsInput.value = "";
+      deathsInput.value  = "";
+      currentKdaEl.textContent     = "—";
+      killsToGoUpEl.textContent    = "—";
+      deathsToGoDownEl.textContent = "—";
+      kdRatioEl.textContent        = "—";
+      killPartEl.textContent       = "—";
+      trendEl.textContent          = "—";
+      trendSubEl.textContent       = "vs previous entry";
+      trendEl.className            = "result-value";
+      personalBestEl.textContent   = "—";
+      sessionAvgEl.textContent     = "—";
       kdaHistory = [];
       drawGraph();
     }
 
+    // ── History ──
     function addKdaPoint(value) {
-      const now = new Date();
-      kdaHistory.push({ time: now, value: value });
-      if (kdaHistory.length > 30) kdaHistory.shift();
+      kdaHistory.push({ time: new Date(), value });
+      if (kdaHistory.length > 40) kdaHistory.shift();
       drawGraph();
+    }
+
+    // ── Tab switching ──
+    function switchTab() {
+      const from = activeTab === 0 ? tab0 : tab1;
+      const to   = activeTab === 0 ? tab1 : tab0;
+      const next = activeTab === 0 ? 1 : 0;
+
+      from.style.opacity = "0";
+      setTimeout(() => {
+        from.classList.add("hidden");
+        to.classList.remove("hidden");
+        to.style.opacity = "0";
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          to.style.opacity = "1";
+        }));
+        activeTab = next;
+        if (activeTab === 0) {
+          tabToggleLabel.textContent = "Extra Stats";
+          panelTitle.textContent     = "Blooded Stats";
+          panelSub.textContent       = "No place for remorse in the life of a hunter.";
+        } else {
+          tabToggleLabel.textContent = "← Back";
+          panelTitle.textContent     = "Hunter's Ledger";
+          panelSub.textContent       = "All derived from your recorded stats.";
+        }
+      }, 220);
+    }
+
+    // ── Lore modal ──
+    heartLogo.addEventListener("click", () => loreModal.classList.add("open"));
+    loreModal.addEventListener("click",  () => loreModal.classList.remove("open"));
+
+    // ── Graph ──
+    function ns(tag, attrs) {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      if (attrs) for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, String(v));
+      return el;
+    }
+
+    function smoothPath(pts) {
+      if (!pts.length) return "";
+      if (pts.length === 1) return `M${pts[0].x},${pts[0].y}`;
+      let d = `M${pts[0].x},${pts[0].y}`;
+      for (let i = 1; i < pts.length; i++) {
+        const p = pts[i - 1], c = pts[i];
+        const cx = p.x + (c.x - p.x) * 0.55;
+        d += ` C${cx},${p.y} ${cx},${c.y} ${c.x},${c.y}`;
+      }
+      return d;
     }
 
     function drawGraph() {
       while (graphSvg.firstChild) graphSvg.removeChild(graphSvg.firstChild);
-      if (kdaHistory.length === 0) return;
+      graphEmpty.style.display = kdaHistory.length === 0 ? "flex" : "none";
 
-      const values = kdaHistory.map(p => p.value);
-      const minVal = Math.min(...values);
-      const maxVal = Math.max(...values);
-      const range = maxVal - minVal || 1;
-
-      const points = kdaHistory.map((p, idx) => {
-        const x = (idx / Math.max(kdaHistory.length - 1, 1)) * 100;
-        const y = 90 - ((p.value - minVal) / range) * 70; // 20–90 band
-        return { x, y };
-      });
-
-      // Gradient defs (crimson theme)
-      const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
-      const grad = document.createElementNS("http://www.w3.org/2000/svg", "linearGradient");
-      grad.setAttribute("id", "kdaLineGradient");
-      grad.setAttribute("x1", "0%");
-      grad.setAttribute("y1", "0%");
-      grad.setAttribute("x2", "100%");
-      grad.setAttribute("y2", "0%");
-      const s1 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
-      s1.setAttribute("offset", "0%");
-      s1.setAttribute("stop-color", "#e04a5a");
-      const s2 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
-      s2.setAttribute("offset", "50%");
-      s2.setAttribute("stop-color", "#c73545");
-      const s3 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
-      s3.setAttribute("offset", "100%");
-      s3.setAttribute("stop-color", "#6b1220");
-      grad.appendChild(s1); grad.appendChild(s2); grad.appendChild(s3);
-      defs.appendChild(grad);
-      graphSvg.appendChild(defs);
-
-      // Smooth-ish path (simple quadratic smoothing)
-      let d = "";
-      for (let i = 0; i < points.length; i++) {
-        const p = points[i];
-        if (i === 0) {
-          d += `M ${p.x},${p.y}`;
-        } else {
-          const prev = points[i - 1];
-          const cx = (prev.x + p.x) / 2;
-          const cy = (prev.y + p.y) / 2;
-          d += ` Q ${prev.x},${prev.y} ${cx},${cy}`;
-        }
+      for (let g = 0; g <= 4; g++) {
+        const y = 5 + (g / 4) * 88;
+        graphSvg.appendChild(ns("line", {
+          x1: 0, y1: y, x2: 100, y2: y,
+          stroke: "rgba(255,255,255,0.038)", "stroke-width": 0.22,
+        }));
       }
 
-      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-      path.setAttribute("d", d);
-      path.setAttribute("fill", "none");
-      path.setAttribute("stroke", "url(#kdaLineGradient)");
-      path.setAttribute("stroke-width", "1.1");
-      path.setAttribute("stroke-linecap", "round");
-      path.setAttribute("stroke-linejoin", "round");
-      path.setAttribute("opacity", "0.95");
-      graphSvg.appendChild(path);
+      if (kdaHistory.length === 0) return;
 
-      // Points (small, refined)
-      points.forEach((pt, idx) => {
-        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        circle.setAttribute("cx", pt.x);
-        circle.setAttribute("cy", pt.y);
-        circle.setAttribute("r", idx === points.length - 1 ? 1.8 : 1.4);
-        circle.setAttribute("fill", idx === points.length - 1 ? "#e04a5a" : "#6b1220");
-        circle.setAttribute("stroke", "rgba(0,0,0,0.9)");
-        circle.setAttribute("stroke-width", "0.5");
-        circle.style.cursor = "pointer";
-        circle.dataset.index = idx.toString();
+      const vals = kdaHistory.map(p => p.value);
+      const lo   = Math.min(...vals);
+      const hi   = Math.max(...vals);
+      const raw  = hi - lo;
+      const pad  = raw === 0 ? 0.5 : raw * 0.18;
+      const vlo  = Math.max(0, lo - pad);
+      const vrng = (hi + pad) - vlo || 1;
 
-        circle.addEventListener("mouseenter", (e) => {
-          const i = parseInt(circle.dataset.index, 10);
-          const entry = kdaHistory[i];
-          const prev = i > 0 ? kdaHistory[i - 1] : null;
-          let deltaText = "First entry";
+      const toX = i => 1 + (i / Math.max(kdaHistory.length - 1, 1)) * 98;
+      const toY = v => 93 - ((v - vlo) / vrng) * 86;
+      const pts = kdaHistory.map((p, i) => ({ x: toX(i), y: toY(p.value) }));
+
+      const defs = ns("defs");
+
+      const lg = ns("linearGradient", { id: "lg", x1: "0%", y1: "0%", x2: "100%", y2: "0%" });
+      lg.appendChild(ns("stop", { offset: "0%",   "stop-color": "#4d0e1a", "stop-opacity": 0.7 }));
+      lg.appendChild(ns("stop", { offset: "55%",  "stop-color": "#c73545", "stop-opacity": 1   }));
+      lg.appendChild(ns("stop", { offset: "100%", "stop-color": "#e04a5a", "stop-opacity": 1   }));
+      defs.appendChild(lg);
+
+      const ag = ns("linearGradient", { id: "ag", x1: "0%", y1: "0%", x2: "0%", y2: "100%" });
+      ag.appendChild(ns("stop", { offset: "0%",   "stop-color": "#b3263a", "stop-opacity": 0.20 }));
+      ag.appendChild(ns("stop", { offset: "100%", "stop-color": "#b3263a", "stop-opacity": 0    }));
+      defs.appendChild(ag);
+
+      const filt  = ns("filter", { id: "glow", x: "-10%", y: "-40%", width: "120%", height: "180%" });
+      const blur  = ns("feGaussianBlur", { in: "SourceGraphic", stdDeviation: "0.45", result: "b" });
+      const merge = ns("feMerge");
+      merge.appendChild(ns("feMergeNode", { in: "b" }));
+      merge.appendChild(ns("feMergeNode", { in: "SourceGraphic" }));
+      filt.appendChild(blur); filt.appendChild(merge);
+      defs.appendChild(filt);
+      graphSvg.appendChild(defs);
+
+      const lp    = smoothPath(pts);
+      const first = pts[0];
+      const last  = pts[pts.length - 1];
+      graphSvg.appendChild(ns("path", {
+        d: `${lp} L${last.x},93 L${first.x},93 Z`,
+        fill: "url(#ag)", stroke: "none",
+      }));
+      graphSvg.appendChild(ns("path", {
+        d: lp, fill: "none",
+        stroke: "url(#lg)", "stroke-width": 0.72,
+        "stroke-linecap": "round", filter: "url(#glow)",
+      }));
+
+      pts.forEach((pt, idx) => {
+        const isLast = idx === pts.length - 1;
+        if (isLast) {
+          graphSvg.appendChild(ns("circle", {
+            cx: pt.x, cy: pt.y, r: 2.8,
+            fill: "none", stroke: "rgba(255,255,255,0.2)", "stroke-width": 0.55,
+          }));
+        }
+        const dot = ns("circle", {
+          cx: pt.x, cy: pt.y,
+          r: isLast ? 1.5 : 0.9,
+          fill: isLast ? "#ffffff" : "rgba(255,255,255,0.7)",
+          stroke: "rgba(0,0,0,0.6)", "stroke-width": 0.3,
+        });
+        dot.style.cursor = "pointer";
+        dot.addEventListener("mouseenter", e => {
+          const entry = kdaHistory[idx];
+          const prev  = idx > 0 ? kdaHistory[idx - 1] : null;
+          let delta   = "First entry";
           if (prev) {
-            const delta = entry.value - prev.value;
-            const sign = delta > 0 ? "+" : delta < 0 ? "-" : "";
-            const mag = Math.abs(delta).toFixed(2);
-            deltaText = `${sign}${mag} since last session`;
+            const d   = entry.value - prev.value;
+            const sym = d > 0 ? "↑" : d < 0 ? "↓" : "=";
+            delta     = `${sym} ${Math.abs(d).toFixed(2)} vs prev`;
           }
-          const timeStr = entry.time.toLocaleString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-            day: "2-digit",
-            month: "2-digit"
+          const t = entry.time.toLocaleString([], {
+            hour: "2-digit", minute: "2-digit", second: "2-digit",
+            day: "2-digit",  month: "2-digit",
           });
-          tooltip.textContent = `${entry.value.toFixed(2)} KDA • ${deltaText} • ${timeStr}`;
+          tooltip.textContent = `${entry.value.toFixed(2)} KDA  ·  ${delta}  ·  ${t}`;
           tooltip.classList.add("visible");
-          positionTooltip(e);
+          moveTooltip(e);
         });
-
-        circle.addEventListener("mousemove", (e) => {
-          positionTooltip(e);
-        });
-
-        circle.addEventListener("mouseleave", () => {
-          tooltip.classList.remove("visible");
-        });
-
-        graphSvg.appendChild(circle);
+        dot.addEventListener("mousemove", moveTooltip);
+        dot.addEventListener("mouseleave", () => tooltip.classList.remove("visible"));
+        graphSvg.appendChild(dot);
       });
     }
 
-    function positionTooltip(evt) {
-      tooltip.style.left = evt.clientX + "px";
-      tooltip.style.top = evt.clientY + "px";
+    function moveTooltip(e) {
+      tooltip.style.left = e.clientX + "px";
+      tooltip.style.top  = e.clientY + "px";
     }
 
+    // ── Event listeners ──
     calcBtn.addEventListener("click", calculate);
     resetBtn.addEventListener("click", reset);
-    [killsInput, assistsInput, deathsInput].forEach((el) => {
-      el.addEventListener("input", calculate);
-    });
+    tabToggleBtn.addEventListener("click", switchTab);
+    [killsInput, assistsInput, deathsInput].forEach(el => el.addEventListener("input", liveUpdate));
 
-    calculate();
+    drawGraph();
   </script>
 </body>
 </html>
