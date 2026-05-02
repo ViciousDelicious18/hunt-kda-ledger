@@ -559,10 +559,98 @@
       letter-spacing: 0.22em;
       text-transform: uppercase;
     }
+
+    .bg-map {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.08;
+      filter: brightness(0.45) saturate(0.6);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── KDA LADDER ── */
+    .ladder-scroll {
+      overflow-x: auto;
+      padding: 8px 0 2px;
+    }
+
+    .ladder-track {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      min-width: max-content;
+      margin: 0 auto;
+    }
+
+    .ladder-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      padding: 0 6px 2px;
+      min-width: 50px;
+      flex-shrink: 0;
+      border-right: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .ladder-cell:last-child { border-right: none; }
+
+    .ladder-top {
+      font-family: "Cinzel", serif;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      min-height: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ladder-up   { color: #5ecf7a; }
+    .ladder-down { color: var(--crimson-light); }
+
+    .ladder-rule {
+      width: 100%;
+      height: 1px;
+      background: rgba(255,255,255,0.07);
+      margin: 1px 0 4px;
+    }
+
+    .ladder-kda {
+      font-family: "Cinzel", serif;
+      font-size: 0.78rem;
+      color: rgba(163,154,169,0.6);
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+
+    .ladder-center .ladder-kda {
+      color: var(--accent-gold);
+      border: 1px solid rgba(201,169,106,0.55);
+      border-radius: 999px;
+      padding: 3px 12px;
+      box-shadow: 0 0 10px rgba(201,169,106,0.14);
+      font-size: 0.90rem;
+    }
+
+    .ladder-empty {
+      font-size: 0.72rem;
+      color: rgba(163,154,169,0.2);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 18px;
+      width: 100%;
+      text-align: center;
+    }
   </style>
 </head>
 
 <body>
+  <img class="bg-map" src="./mamon.png" alt="" />
   <div class="fog-overlay"></div>
 
   <!-- LORE MODAL -->
@@ -721,6 +809,21 @@
       </div>
     </div>
 
+    <!-- LADDER PANEL -->
+    <div class="panel">
+      <div class="panel-inner">
+        <div class="panel-header">
+          <h2>KDA Ladder</h2>
+          <span>Kills / deaths to each tier</span>
+        </div>
+        <div class="ladder-scroll">
+          <div class="ladder-track" id="kdaLadder">
+            <div class="ladder-empty">Enter stats to see ladder</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     </div><!-- /content-col -->
   </div><!-- /page-layout -->
 
@@ -811,6 +914,7 @@
     // Called on every keystroke — updates display only, no history recorded
     function liveUpdate() {
       displayStats(computeStats());
+      buildLadder();
     }
 
     // Called only on Calculate button — records to history and updates graph
@@ -895,6 +999,7 @@
       sessionAvgEl.textContent     = "—";
       kdaHistory = [];
       drawGraph();
+      buildLadder();
     }
 
     // ── History ──
@@ -1056,6 +1161,65 @@
     function moveTooltip(e) {
       tooltip.style.left = e.clientX + "px";
       tooltip.style.top  = e.clientY + "px";
+    }
+
+    // ── KDA Ladder ──
+    function buildLadder() {
+      const ladder  = document.getElementById("kdaLadder");
+      ladder.innerHTML = "";
+
+      const kills   = parseNum(killsInput);
+      const assists = parseNum(assistsInput);
+      const deaths  = parseNum(deathsInput);
+      const totalKA = kills + assists;
+
+      if (deaths === 0) {
+        ladder.innerHTML = '<div class="ladder-empty">Enter stats to see ladder</div>';
+        return;
+      }
+
+      const disp  = Math.round((totalKA / deaths) * 100) / 100;
+      const STEPS = 10;
+
+      for (let i = -STEPS; i <= STEPS; i++) {
+        const target = Math.round((disp + i * 0.01) * 100) / 100;
+        const cell   = document.createElement("div");
+        cell.className = "ladder-cell" + (i === 0 ? " ladder-center" : "");
+
+        let topText  = "";
+        let topClass = "";
+
+        if (i > 0) {
+          const needed = Math.ceil((target - 0.005) * deaths) - totalKA;
+          topText  = needed <= 0 ? "0" : "+" + needed;
+          topClass = "ladder-up";
+        } else if (i < 0) {
+          const thresh = target + 0.005;
+          if (thresh <= 0) {
+            topText = "—";
+          } else {
+            const needed = Math.ceil(totalKA / thresh - deaths);
+            topText  = needed <= 0 ? "0" : "−" + needed;
+          }
+          topClass = "ladder-down";
+        }
+
+        const top = document.createElement("div");
+        top.className = "ladder-top" + (topClass ? " " + topClass : "");
+        top.textContent = topText;
+
+        const rule = document.createElement("div");
+        rule.className = "ladder-rule";
+
+        const kda = document.createElement("div");
+        kda.className = "ladder-kda";
+        kda.textContent = target.toFixed(2);
+
+        cell.appendChild(top);
+        cell.appendChild(rule);
+        cell.appendChild(kda);
+        ladder.appendChild(cell);
+      }
     }
 
     // ── localStorage persistence ──
